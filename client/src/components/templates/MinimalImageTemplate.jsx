@@ -1,0 +1,217 @@
+import React from "react";
+
+const MinimalImageResume = ({ data }) => {
+    const personalInfo = data?.personal_info || data?.personalInfo || {};
+    const summary = data?.professional_summary || data?.summary || "";
+    
+    let skills = [];
+    if (Array.isArray(data?.skills)) {
+        skills = data.skills;
+    } else if (data?.skills && typeof data.skills === 'object') {
+        skills = Object.values(data.skills).flat();
+    }
+
+    const rawExperience = data?.experience || [];
+    const experience = rawExperience.map(exp => ({
+        position: exp.position || exp.role || "",
+        company: exp.company || "",
+        startDate: exp.startDate || exp.startYear || "",
+        endDate: exp.endDate || exp.endYear || "Present",
+        description: Array.isArray(exp.description) 
+            ? exp.description 
+            : Array.isArray(exp.responsibilities) 
+            ? exp.responsibilities 
+            : exp.description ? [exp.description] 
+            : exp.responsibilities ? [exp.responsibilities] : []
+    }));
+
+    const rawEducation = data?.education || [];
+    const education = rawEducation.map(edu => ({
+        degree: edu.degree || "",
+        school: edu.school || edu.institute || edu.institution || "",
+        startYear: edu.startYear || edu.startDate || "",
+        endYear: edu.endYear || edu.endDate || "",
+        cgpa: edu.cgpa || ""
+    }));
+
+    const rawProjects = data?.projects || data?.project || [];
+    const projects = rawProjects.map(proj => ({
+        title: proj.title || "",
+        link: proj.link || proj.website || "",
+        description: proj.description || "",
+        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || "")
+    }));
+
+    const rawCertifications = data?.certifications || [];
+    const certifications = rawCertifications.map(cert => 
+        typeof cert === 'string' ? cert : [cert.title, cert.issuer, cert.year].filter(Boolean).join(" - ")
+    );
+
+    return (
+        <div className="max-w-[850px] mx-auto bg-white text-gray-900 p-10 font-sans">
+
+            {/* Header */}
+            <header className="flex justify-between items-start border-b border-gray-300 pb-6">
+
+                <div className="flex-1">
+
+                    <h1 className="text-4xl font-bold tracking-wide">
+                        {personalInfo.full_name}
+                    </h1>
+
+                    <p className="text-lg text-gray-600 mt-1">
+                        {personalInfo.profession}
+                    </p>
+
+                    <div className="mt-4 text-sm space-y-1">
+                        {personalInfo.email && <p>{personalInfo.email}</p>}
+                        {personalInfo.phone && <p>{personalInfo.phone}</p>}
+                        {personalInfo.location && <p>{personalInfo.location}</p>}
+                        {personalInfo.linkedin && <p>{personalInfo.linkedin}</p>}
+                        {personalInfo.website && <p>{personalInfo.website}</p>}
+                    </div>
+
+                </div>
+
+                {personalInfo.image && (
+                    <img
+                        src={
+                            typeof personalInfo.image === "string"
+                                ? personalInfo.image
+                                : URL.createObjectURL(personalInfo.image)
+                        }
+                        alt="Profile"
+                        className="w-28 h-28 rounded-full object-cover border-2 border-gray-200"
+                    />
+                )}
+
+            </header>
+
+            {/* Dynamic Sections Order */}
+            {(() => {
+                const renderSectionMap = {
+                    summary: summary ? (
+                        <Section key="summary" title="Professional Summary">
+                            <p>{summary}</p>
+                        </Section>
+                    ) : null,
+                    skills: skills.length > 0 ? (
+                        <Section key="skills" title="Technical Skills">
+                            <div className="flex flex-wrap gap-2">
+                                {skills.map((skill, index) => (
+                                    <span
+                                        key={index}
+                                        className="px-3 py-1 rounded-full bg-gray-100 text-sm"
+                                    >
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+                        </Section>
+                    ) : null,
+                    experience: experience.length > 0 ? (
+                        <Section key="experience" title="Professional Experience">
+                            {experience.map((exp, index) => (
+                                <div key={index} className="mb-6">
+                                    <div className="flex justify-between">
+                                        <div>
+                                            <h3 className="font-semibold text-lg">
+                                                {exp.position}
+                                            </h3>
+                                            <p className="text-gray-600">
+                                                {exp.company}
+                                            </p>
+                                        </div>
+                                        <span className="text-sm text-gray-500">
+                                            {exp.startDate} - {exp.endDate}
+                                        </span>
+                                    </div>
+                                    <ul className="list-disc ml-5 mt-3 space-y-1">
+                                        {exp.description.map((point, i) => (
+                                            <li key={i}>{point}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </Section>
+                    ) : null,
+                    projects: projects.length > 0 ? (
+                        <Section key="projects" title="Projects">
+                            {projects.map((project, index) => (
+                                <div key={index} className="mb-5">
+                                    <div className="flex justify-between">
+                                        <h3 className="font-semibold">
+                                            {project.title}
+                                        </h3>
+                                        {project.link && (
+                                            <span className="text-sm">
+                                                {project.link}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="mt-2">
+                                        {project.description}
+                                    </p>
+                                    {project.techStack && (
+                                        <p className="mt-2 text-sm">
+                                            <strong>Tech:</strong> {project.techStack}
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </Section>
+                    ) : null,
+                    education: education.length > 0 ? (
+                        <Section key="education" title="Education">
+                            {education.map((edu, index) => (
+                                <div key={index} className="mb-4">
+                                    <div className="flex justify-between">
+                                        <h3 className="font-semibold">
+                                            {edu.degree}
+                                        </h3>
+                                        <span className="text-sm">
+                                            {edu.startYear} - {edu.endYear}
+                                        </span>
+                                    </div>
+                                    <p>{edu.school}</p>
+                                    {edu.cgpa && (
+                                        <p className="text-sm text-gray-600">
+                                            CGPA: {edu.cgpa}
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </Section>
+                    ) : null,
+                    certifications: certifications.length > 0 ? (
+                        <Section key="certifications" title="Certifications">
+                            <ul className="list-disc ml-5">
+                                {certifications.map((cert, index) => (
+                                    <li key={index}>{cert}</li>
+                                ))}
+                            </ul>
+                        </Section>
+                    ) : null,
+                };
+
+                const defaultOrder = ['summary', 'skills', 'experience', 'education', 'projects', 'certifications'];
+                const sectionOrder = data?.sections_order || defaultOrder;
+                return sectionOrder.map(secKey => renderSectionMap[secKey]);
+            })()}
+        </div>
+    );
+};
+
+const Section = ({ title, children }) => (
+    <section className="mt-8">
+
+        <h2 className="uppercase tracking-wider font-bold text-sm border-b border-gray-300 pb-2 mb-4">
+            {title}
+        </h2>
+
+        {children}
+
+    </section>
+);
+
+export default MinimalImageResume;
