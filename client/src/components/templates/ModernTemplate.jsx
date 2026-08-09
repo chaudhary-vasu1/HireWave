@@ -51,6 +51,14 @@ const ModernATSResume = ({ data, resume, accentColor = "#3B82F6" }) => {
     const achievements = rawData?.achievements || [];
     const languages = rawData?.languages || [];
 
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
     return (
         <div className="max-w-4xl mx-auto bg-white text-gray-900 p-10 shadow-lg font-sans">
 
@@ -65,11 +73,11 @@ const ModernATSResume = ({ data, resume, accentColor = "#3B82F6" }) => {
                 </p>
 
                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm mt-4 text-gray-700">
-                    <span>{personalInfo.email}</span>
-                    <span>{personalInfo.phone}</span>
-                    <span>{personalInfo.location}</span>
-                    <span>{personalInfo.linkedin}</span>
-                    <span>{personalInfo.website}</span>
+                    {personalInfo.email && <a href={`mailto:${personalInfo.email}`} className="hover:underline">{personalInfo.email}</a>}
+                    {personalInfo.phone && <a href={`tel:${personalInfo.phone}`} className="hover:underline">{personalInfo.phone}</a>}
+                    {personalInfo.location && <span>{personalInfo.location}</span>}
+                    {personalInfo.linkedin && <a href={formatUrl(personalInfo.linkedin)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600">{personalInfo.linkedin}</a>}
+                    {personalInfo.website && <a href={formatUrl(personalInfo.website)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600">{personalInfo.website}</a>}
                 </div>
             </header>
 
@@ -139,9 +147,11 @@ const ModernATSResume = ({ data, resume, accentColor = "#3B82F6" }) => {
                                         <h3 className="font-semibold">
                                             {project.title}
                                         </h3>
-                                        <span className="text-sm text-blue-600">
-                                            {project.link}
-                                        </span>
+                                        {project.link && (
+                                            <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
+                                                {project.link}
+                                            </a>
+                                        )}
                                     </div>
                                     <p className="mt-1">{project.description}</p>
                                     {project.techStack && (

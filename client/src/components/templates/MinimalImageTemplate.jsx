@@ -47,6 +47,14 @@ const MinimalImageResume = ({ data }) => {
         typeof cert === 'string' ? cert : [cert.title, cert.issuer, cert.year].filter(Boolean).join(" - ")
     );
 
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
     return (
         <div className="max-w-[850px] mx-auto bg-white text-gray-900 p-10 font-sans">
 
@@ -64,11 +72,11 @@ const MinimalImageResume = ({ data }) => {
                     </p>
 
                     <div className="mt-4 text-sm space-y-1">
-                        {personalInfo.email && <p>{personalInfo.email}</p>}
-                        {personalInfo.phone && <p>{personalInfo.phone}</p>}
+                        {personalInfo.email && <p><a href={`mailto:${personalInfo.email}`} className="hover:underline">{personalInfo.email}</a></p>}
+                        {personalInfo.phone && <p><a href={`tel:${personalInfo.phone}`} className="hover:underline">{personalInfo.phone}</a></p>}
                         {personalInfo.location && <p>{personalInfo.location}</p>}
-                        {personalInfo.linkedin && <p>{personalInfo.linkedin}</p>}
-                        {personalInfo.website && <p>{personalInfo.website}</p>}
+                        {personalInfo.linkedin && <p><a href={formatUrl(personalInfo.linkedin)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-700">{personalInfo.linkedin}</a></p>}
+                        {personalInfo.website && <p><a href={formatUrl(personalInfo.website)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-700">{personalInfo.website}</a></p>}
                     </div>
 
                 </div>
@@ -144,9 +152,9 @@ const MinimalImageResume = ({ data }) => {
                                             {project.title}
                                         </h3>
                                         {project.link && (
-                                            <span className="text-sm">
+                                            <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-700 hover:underline">
                                                 {project.link}
-                                            </span>
+                                            </a>
                                         )}
                                     </div>
                                     <p className="mt-2">

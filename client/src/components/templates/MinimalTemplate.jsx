@@ -54,6 +54,14 @@ const ATSPremiumResume = ({ data }) => {
 
     const achievements = data?.achievements || [];
 
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
     return (
         <div
             className="w-[210mm] min-h-[297mm] mx-auto bg-white text-gray-900
@@ -70,11 +78,11 @@ const ATSPremiumResume = ({ data }) => {
                 </p>
 
                 <div className="mt-3 text-[13px] flex flex-wrap gap-x-5 gap-y-1">
-                    {personalInfo.phone && <span>{personalInfo.phone}</span>}
-                    {personalInfo.email && <span>{personalInfo.email}</span>}
+                    {personalInfo.phone && <a href={`tel:${personalInfo.phone}`} className="hover:underline">{personalInfo.phone}</a>}
+                    {personalInfo.email && <a href={`mailto:${personalInfo.email}`} className="hover:underline">{personalInfo.email}</a>}
                     {personalInfo.location && <span>{personalInfo.location}</span>}
-                    {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
-                    {personalInfo.website && <span>{personalInfo.website}</span>}
+                    {personalInfo.linkedin && <a href={formatUrl(personalInfo.linkedin)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-700">{personalInfo.linkedin}</a>}
+                    {personalInfo.website && <a href={formatUrl(personalInfo.website)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-700">{personalInfo.website}</a>}
                 </div>
             </header>
 

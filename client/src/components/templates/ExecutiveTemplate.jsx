@@ -50,6 +50,14 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
     const achievements = data?.achievements || [];
     const languages = data?.languages || [];
 
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
     return (
         <div className="max-w-[850px] mx-auto bg-white text-slate-900 p-10 font-serif leading-normal border-t-8" style={{ borderColor: accentColor }}>
             {/* Executive Header */}
@@ -65,11 +73,11 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
                 )}
 
                 <div className="mt-4 flex flex-wrap justify-center items-center gap-x-4 gap-y-1 text-xs text-slate-600 font-sans font-medium">
-                    {personalInfo.phone && <span>{personalInfo.phone}</span>}
-                    {personalInfo.email && <span>• {personalInfo.email}</span>}
+                    {personalInfo.phone && <a href={`tel:${personalInfo.phone}`} className="hover:underline">{personalInfo.phone}</a>}
+                    {personalInfo.email && <a href={`mailto:${personalInfo.email}`} className="hover:underline">• {personalInfo.email}</a>}
                     {personalInfo.location && <span>• {personalInfo.location}</span>}
-                    {personalInfo.linkedin && <span>• {personalInfo.linkedin}</span>}
-                    {personalInfo.website && <span>• {personalInfo.website}</span>}
+                    {personalInfo.linkedin && <a href={formatUrl(personalInfo.linkedin)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-800">• {personalInfo.linkedin}</a>}
+                    {personalInfo.website && <a href={formatUrl(personalInfo.website)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-800">• {personalInfo.website}</a>}
                 </div>
             </header>
 
@@ -136,7 +144,11 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
                                         <h3 className="font-bold text-sm text-slate-900">
                                             {project.title}
                                         </h3>
-                                        {project.link && <span className="text-xs text-slate-500 font-medium">{project.link}</span>}
+                                        {project.link && (
+                                            <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-700 hover:underline font-medium">
+                                                {project.link}
+                                            </a>
+                                        )}
                                     </div>
                                     <p className="text-xs text-slate-800 mt-1 font-sans">{project.description}</p>
                                     {project.techStack && (

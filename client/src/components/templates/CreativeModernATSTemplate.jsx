@@ -50,6 +50,14 @@ const CreativeModernATSTemplate = ({ data, accentColor = "#4f46e5" }) => {
     const achievements = data?.achievements || [];
     const languages = data?.languages || [];
 
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
     // Separate sidebar items (contact, skills, education, certifications, languages) vs main content items (summary, experience, projects, achievements)
     const sidebarSectionKeys = new Set(['skills', 'education', 'certifications', 'languages']);
 
@@ -84,11 +92,11 @@ const CreativeModernATSTemplate = ({ data, accentColor = "#4f46e5" }) => {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-white/20 flex flex-wrap gap-x-5 gap-y-1 text-xs opacity-95">
-                    {personalInfo.email && <span>📧 {personalInfo.email}</span>}
-                    {personalInfo.phone && <span>📞 {personalInfo.phone}</span>}
+                    {personalInfo.email && <a href={`mailto:${personalInfo.email}`} className="hover:underline">📧 {personalInfo.email}</a>}
+                    {personalInfo.phone && <a href={`tel:${personalInfo.phone}`} className="hover:underline">📞 {personalInfo.phone}</a>}
                     {personalInfo.location && <span>📍 {personalInfo.location}</span>}
-                    {personalInfo.linkedin && <span>🔗 {personalInfo.linkedin}</span>}
-                    {personalInfo.website && <span>🌐 {personalInfo.website}</span>}
+                    {personalInfo.linkedin && <a href={formatUrl(personalInfo.linkedin)} target="_blank" rel="noopener noreferrer" className="hover:underline">🔗 {personalInfo.linkedin}</a>}
+                    {personalInfo.website && <a href={formatUrl(personalInfo.website)} target="_blank" rel="noopener noreferrer" className="hover:underline">🌐 {personalInfo.website}</a>}
                 </div>
             </header>
 
@@ -136,7 +144,11 @@ const CreativeModernATSTemplate = ({ data, accentColor = "#4f46e5" }) => {
                                         <div key={index} className="mb-3 text-xs">
                                             <div className="flex justify-between items-baseline font-semibold">
                                                 <span className="text-slate-900">{project.title}</span>
-                                                {project.link && <span className="text-indigo-600 text-[11px]">{project.link}</span>}
+                                                {project.link && (
+                                                    <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 text-[11px] hover:underline">
+                                                        {project.link}
+                                                    </a>
+                                                )}
                                             </div>
                                             <p className="text-slate-700 mt-0.5">{project.description}</p>
                                             {project.techStack && (

@@ -51,6 +51,14 @@ const TechProfessionalTemplate = ({ data, accentColor = "#0284c7" }) => {
     const achievements = data?.achievements || [];
     const languages = data?.languages || [];
 
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
     return (
         <div className="max-w-[850px] mx-auto bg-white text-slate-900 p-10 font-sans leading-relaxed">
             {/* Header */}
@@ -66,12 +74,12 @@ const TechProfessionalTemplate = ({ data, accentColor = "#0284c7" }) => {
                 )}
 
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 font-mono">
-                    {personalInfo.email && <span>{personalInfo.email}</span>}
-                    {personalInfo.phone && <span>| {personalInfo.phone}</span>}
+                    {personalInfo.email && <a href={`mailto:${personalInfo.email}`} className="hover:underline">{personalInfo.email}</a>}
+                    {personalInfo.phone && <a href={`tel:${personalInfo.phone}`} className="hover:underline">| {personalInfo.phone}</a>}
                     {personalInfo.location && <span>| {personalInfo.location}</span>}
-                    {personalInfo.github && <span>| {personalInfo.github}</span>}
-                    {personalInfo.linkedin && <span>| {personalInfo.linkedin}</span>}
-                    {personalInfo.website && <span>| {personalInfo.website}</span>}
+                    {personalInfo.github && <a href={formatUrl(personalInfo.github)} target="_blank" rel="noopener noreferrer" className="hover:underline text-sky-600">| {personalInfo.github}</a>}
+                    {personalInfo.linkedin && <a href={formatUrl(personalInfo.linkedin)} target="_blank" rel="noopener noreferrer" className="hover:underline text-sky-600">| {personalInfo.linkedin}</a>}
+                    {personalInfo.website && <a href={formatUrl(personalInfo.website)} target="_blank" rel="noopener noreferrer" className="hover:underline text-sky-600">| {personalInfo.website}</a>}
                 </div>
             </header>
 
@@ -148,7 +156,11 @@ const TechProfessionalTemplate = ({ data, accentColor = "#0284c7" }) => {
                                         <h3 className="font-bold text-sm text-slate-900">
                                             {project.title}
                                         </h3>
-                                        {project.link && <span className="text-xs font-mono text-sky-600">{project.link}</span>}
+                                        {project.link && (
+                                            <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-sky-600 hover:underline">
+                                                {project.link}
+                                            </a>
+                                        )}
                                     </div>
                                     <p className="text-xs text-slate-700 mt-1">{project.description}</p>
                                     {project.techStack && (

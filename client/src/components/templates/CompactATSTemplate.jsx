@@ -50,6 +50,14 @@ const CompactATSTemplate = ({ data, accentColor = "#0f766e" }) => {
     const achievements = data?.achievements || [];
     const languages = data?.languages || [];
 
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
     return (
         <div className="max-w-[850px] mx-auto bg-white text-slate-900 p-8 font-sans leading-snug">
             {/* Header */}
@@ -66,10 +74,11 @@ const CompactATSTemplate = ({ data, accentColor = "#0f766e" }) => {
                 </div>
 
                 <div className="text-right text-[11px] text-slate-600 space-y-0.5">
-                    {personalInfo.email && <div>{personalInfo.email}</div>}
-                    {personalInfo.phone && <div>{personalInfo.phone}</div>}
+                    {personalInfo.email && <div><a href={`mailto:${personalInfo.email}`} className="hover:underline">{personalInfo.email}</a></div>}
+                    {personalInfo.phone && <div><a href={`tel:${personalInfo.phone}`} className="hover:underline">{personalInfo.phone}</a></div>}
                     {personalInfo.location && <div>{personalInfo.location}</div>}
-                    {personalInfo.linkedin && <div>{personalInfo.linkedin}</div>}
+                    {personalInfo.linkedin && <div><a href={formatUrl(personalInfo.linkedin)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-700">{personalInfo.linkedin}</a></div>}
+                    {personalInfo.website && <div><a href={formatUrl(personalInfo.website)} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-700">{personalInfo.website}</a></div>}
                 </div>
             </header>
 
@@ -124,7 +133,11 @@ const CompactATSTemplate = ({ data, accentColor = "#0f766e" }) => {
                                 <div key={index} className="mb-2 text-xs">
                                     <div className="flex justify-between items-baseline font-semibold">
                                         <span className="text-slate-900">{project.title}</span>
-                                        {project.link && <span className="text-slate-500 text-[11px]">{project.link}</span>}
+                                        {project.link && (
+                                            <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-blue-700 text-[11px] hover:underline">
+                                                {project.link}
+                                            </a>
+                                        )}
                                     </div>
                                     <p className="text-slate-700 mt-0.5">{project.description}</p>
                                     {project.techStack && (
