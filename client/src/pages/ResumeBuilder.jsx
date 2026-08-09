@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import dummyResumeData from '../assets/assets'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeftIcon, Briefcase, ChevronLeft, ChevronRight, FileText, FolderIcon, GraduationCap, Sparkles, User, ArrowUp, ArrowDown, ArrowUpDown, Layout, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon, Form } from 'lucide-react'
+import { ArrowLeftIcon, Briefcase, ChevronLeft, ChevronRight, FileText, FolderIcon, GraduationCap, Sparkles, User, ArrowUp, ArrowDown, ArrowUpDown, Layout, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon, Form, Award, Trophy, Globe } from 'lucide-react'
 import PersonalInfoForm from "../components/PersonalInfoForm";
 import SummaryForm from "../components/SummaryForm";
 import ExperienceForm from "../components/ExperienceForm";
@@ -9,6 +9,9 @@ import EducationForm from "../components/EducationForm";
 import ResumePreview from "../components/ResumePreview";
 import ProjectForm from "../components/ProjectForm";
 import SkillsForm from "../components/SkillsForm"; 
+import CertificationForm from "../components/CertificationForm";
+import AchievementsForm from "../components/AchievementsForm";
+import LanguagesForm from "../components/LanguagesForm";
 import {useSelector} from 'react-redux';
 import api from '../configs/api.js';
 import toast from "react-hot-toast";
@@ -48,6 +51,9 @@ const ResumeBuilder = () => {
     projects: [],
     project: [],
     skills: [],
+    certifications: [],
+    achievements: [],
+    languages: [],
     template: "classic",
     accent_color: '#3B82F6',
     public: false,
@@ -82,6 +88,9 @@ const ResumeBuilder = () => {
     { id: 'education', name: 'Education', icon: GraduationCap },
     { id: 'projects', name: 'Projects', icon: FolderIcon },
     { id: 'skills', name: 'Skills', icon: Sparkles },
+    { id: 'certifications', name: 'Certifications', icon: Award },
+    { id: 'achievements', name: 'Achievements', icon: Trophy },
+    { id: 'languages', name: 'Languages', icon: Globe },
     { id: 'reorder', name: 'Reorder Sections', icon: ArrowUpDown },
   ]
   const activeSection = sections[activeSectionIndex];
@@ -246,6 +255,18 @@ navigator.share({url:resumeUrl , text: "My Resume" ,})
                 {/*  Skills content*/}
                 {(activeSection.id === 'Skills' || activeSection.id === 'skills') && (
                   <SkillsForm data={resumeData.skills || resumeData.skill || []} onChange={(data) => setResumeData(prev => ({ ...prev, skills: data }))} />
+                )}
+                {/*  Certifications content*/}
+                {activeSection.id === 'certifications' && (
+                  <CertificationForm data={resumeData.certifications || []} onChange={(data) => setResumeData(prev => ({ ...prev, certifications: data }))} />
+                )}
+                {/*  Achievements content*/}
+                {activeSection.id === 'achievements' && (
+                  <AchievementsForm data={resumeData.achievements || []} onChange={(data) => setResumeData(prev => ({ ...prev, achievements: data }))} />
+                )}
+                {/*  Languages content*/}
+                {activeSection.id === 'languages' && (
+                  <LanguagesForm data={resumeData.languages || []} onChange={(data) => setResumeData(prev => ({ ...prev, languages: data }))} />
                 )}
 
                   

@@ -71,56 +71,66 @@ try {
     if(!resumeText){
         return res.status(400).json({message:"missing required fields"});
     }
-    const systemPrompt = "You are an expert AI agent to extract data from resume"
-    const userPrompt = `extract data from this resume : ${resumeText} 
-    provide data in the following JSON format with no additional text before or after:
-    {
-    professional_summary: { type: String, default: ''},
-    skills: [{ type: String }],
-    personal_info: {
-        image: {type: String, default: '' },
-        full_name: {type: String, default: '' },
-        profession: {type: String, default: ' '},
-        email: {type: String, default: ''},
-        phone:{type:String , default:''},
-        location:{type:String , default:''},
-        linkedin:{type:String , default:''},
-        website:{type:String , default:''}
-    },
+    const systemPrompt = "You are an expert AI resume parser. Extract all candidate info from the provided resume text into a structured JSON object strictly matching the specified JSON format."
+    const userPrompt = `Extract data from this resume:
 
-    experience: [
+${resumeText}
+
+Provide data in EXACTLY the following JSON format with no extra markdown or wrapping text:
+{
+  "professional_summary": "Summary statement...",
+  "skills": ["Skill 1", "Skill 2"],
+  "personal_info": {
+    "image": "",
+    "full_name": "Full Name",
+    "profession": "Job Title / Profession",
+    "email": "email@example.com",
+    "phone": "+1234567890",
+    "location": "City, Country",
+    "linkedin": "linkedin.com/in/username",
+    "website": "portfolio.com"
+  },
+  "experience": [
     {
-        company: { type: String },
-        position: { type: String },
-        start_date: { type: String },
-        end_date: { type: String },
-        description: { type: String },
-        is_current: { type: Boolean },
-}
-    ],
-     projects: [
-    {
-        name: { type: String },
-        type: { type: String },
-        description: { type: String },
+      "company": "Company Name",
+      "position": "Job Title",
+      "start_date": "Jan 2020",
+      "end_date": "Present",
+      "description": "Responsibility or accomplishment",
+      "is_current": false
     }
-    ],
-
-     education: [
+  ],
+  "projects": [
     {
-        institution: { type: String },
-        degree: { type: String },
-        field: { type: String },
-        graduation_date: { type: String },
-        gpa: { type: String },
-        
-}
-    ],
-
-    
+      "name": "Project Name",
+      "type": "Web App",
+      "description": "Project overview and features"
     }
-    
-    `
+  ],
+  "education": [
+    {
+      "institution": "University Name",
+      "degree": "Bachelor of Science",
+      "field": "Computer Science",
+      "graduation_date": "2022",
+      "gpa": "3.8"
+    }
+  ],
+  "certifications": [
+    {
+      "title": "Certification / License Name",
+      "issuer": "Issuing Organization",
+      "year": "2023"
+    }
+  ],
+  "achievements": [
+    "Key achievement or award"
+  ],
+  "languages": [
+    "English"
+  ]
+}
+`
 
  const response = await ai.chat.completions.create({
 model: process.env.OPENAI_MODEL,
@@ -136,6 +146,14 @@ response_format :{type:'json_object'}
 )
 const extractedData = response.choices[0].message.content;
 const parsedData = JSON.parse(extractedData);
+
+// Normalize certifications if returned as strings
+if (Array.isArray(parsedData.certifications)) {
+  parsedData.certifications = parsedData.certifications.map(cert => 
+    typeof cert === 'string' ? { title: cert, issuer: '', year: '' } : cert
+  );
+}
+
 const newResume = await Resume.create({userId , title , ...parsedData})
 return res.json({resumeId:newResume._id});
 }

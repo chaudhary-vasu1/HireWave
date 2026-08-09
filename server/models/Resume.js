@@ -48,7 +48,19 @@ const ResumeSchema = new mongoose.Schema({
 }
     ],
 
-
+     certifications: [
+    {
+        title: { type: String, default: '' },
+        issuer: { type: String, default: '' },
+        year: { type: String, default: '' }
+    }
+    ],
+     achievements: [{ type: String }],
+     languages: [{ type: String }],
+     sections_order: {
+        type: [{ type: String }],
+        default: ['summary', 'skills', 'experience', 'education', 'projects', 'certifications', 'achievements', 'languages']
+     }
 
 },{timestamps:true , minimize:false} )
 
