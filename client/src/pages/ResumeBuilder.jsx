@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import dummyResumeData from '../assets/assets'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeftIcon, Briefcase, ChevronLeft, ChevronRight, FileText, FolderIcon, GraduationCap, Sparkles, User, ArrowUp, ArrowDown, ArrowUpDown, Layout } from 'lucide-react'
+import { ArrowLeftIcon, Briefcase, ChevronLeft, ChevronRight, FileText, FolderIcon, GraduationCap, Sparkles, User, ArrowUp, ArrowDown, ArrowUpDown, Layout, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon, Form } from 'lucide-react'
 import PersonalInfoForm from "../components/PersonalInfoForm";
+import SummaryForm from "../components/SummaryForm";
+import ExperienceForm from "../components/ExperienceForm";
+import EducationForm from "../components/EducationForm";
 import ResumePreview from "../components/ResumePreview";
+import ProjectForm from "../components/ProjectForm";
+import SkillsForm from "../components/SkillsForm"; 
+import {useSelector} from 'react-redux';
+import api from '../configs/api.js';
+import toast from "react-hot-toast";
 
 const defaultSectionsOrder = [
   'summary',
@@ -28,7 +36,8 @@ const sectionLabels = {
 };
 
 const ResumeBuilder = () => {
-  const { resumeId } = useParams()
+  const { resumeId } = useParams();
+  const {token}  = useSelector(state => state.auth);
   const [resumeData, setResumeData] = useState({
     _id: '',
     title: '',
@@ -36,6 +45,7 @@ const ResumeBuilder = () => {
     professional_summary: "",
     experience: [],
     education: [],
+    projects: [],
     project: [],
     skills: [],
     template: "classic",
@@ -45,13 +55,16 @@ const ResumeBuilder = () => {
   })
 
   const loadExistingResume = async () => {
-    const resume = dummyResumeData.find(resume => String(resume._id) === String(resumeId))
-    if (resume) {
-      setResumeData({
-        ...resume,
-        sections_order: resume.sections_order || defaultSectionsOrder
-      });
-      document.title = resume.title
+    try {
+      const {data} = await api.get('/api/resumes/get/' + resumeId ,{headers:{
+        Authorization:token
+      }})
+      if(data.resume){
+         setResumeData(data.resume);
+         document.title = data.resume.title;
+      }
+    } catch (error) {
+       console.log(error.message);
     }
   }
 
@@ -93,6 +106,60 @@ const ResumeBuilder = () => {
     setResumeData(prev => ({ ...prev, sections_order: newOrder }));
   };
 
+  const changeResumeVisibility = async () => { 
+    
+    try {
+      const formData = new FormData();
+      formData.append("resumeId" , resumeId);
+      formData.append("resumeData" , JSON.stringify({public :!resumeData.public}))
+       const {data} = await api.put('/api/resumes/update',formData ,{headers:{
+        Authorization:token
+      }})
+      setResumeData({... resumeData , public :!resumeData.public})
+      toast.success(data.message);
+    } catch (error) {
+      console.error("Error saving resume" , error);
+    }
+  }
+  const handleShare = () =>{
+    const frontendUrl = window.location.href.split('/app/')[0];
+    const resumeUrl = frontendUrl + '/view/' +resumeId
+
+    if(navigator.share){
+navigator.share({url:resumeUrl , text: "My Resume" ,})
+    }
+    else{
+      alert('Share not supported on this browser.')
+    }
+    
+  }
+  const downloadResume = () =>{
+    window.print();
+  }
+
+  const saveResume = async()=>{
+    try {
+      let updatedResumeData = structuredClone(resumeData);
+      // remove image
+      if(typeof resumeData.personal_info.image === 'object'){
+        delete updatedResumeData.personal_info.image
+      }
+      const formData = new FormData();
+      formData.append("resumeId" , resumeId);
+      formData.append("resumeData" , JSON.stringify(updatedResumeData))
+      removeBackground && formData.append("removeBackground" , "yes");
+      typeof resumeData.personal_info.image === 'object' && formData.append("image" , resumeData.personal_info.image);
+
+      const {data} = await api.put('/api/resume/update' , formData , {headers:{
+        Authorization:token}})
+
+        setResumeData(data.resume);
+        toast.success(data.message)
+    } catch (error) {
+       console.error("error saving resume" , error);
+    }
+  }
+
   return (
     <div>
       <div className='max-w-7xl mx-auto px-4 py-6 '>
@@ -119,10 +186,10 @@ const ResumeBuilder = () => {
                     <button
                       key={sec.id}
                       onClick={() => setActiveSectionIndex(idx)}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                         isActive 
-                          ? 'bg-sky-500 text-white shadow-sm' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-sm shadow-sky-500/20' 
+                          : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
                       }`}
                     >
                       <Icon className="size-3.5" />
@@ -133,45 +200,64 @@ const ResumeBuilder = () => {
               </div>
 
               {/* section navigation buttons */}
-              <div className="flex justify-between items-center mb-6 border-b border-gray-300 pb-2">
-                <span className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-3">
+                <span className="text-sm font-bold text-gray-800 flex items-center gap-2">
                   {activeSection.icon && <activeSection.icon className="size-4 text-sky-600" />}
                   {activeSection.name}
                 </span>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {activeSectionIndex !== 0 && (
-                    <button onClick={() => setActiveSectionIndex((prevIndex) => Math.max(prevIndex - 1, 0))} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-all">
+                    <button onClick={() => setActiveSectionIndex((prevIndex) => Math.max(prevIndex - 1, 0))} className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-all cursor-pointer border border-gray-200">
                       <ChevronLeft className="size-3.5" /> Previous
                     </button>
                   )}
 
                   {activeSectionIndex !== sections.length - 1 && (
-                    <button onClick={() => setActiveSectionIndex((prevIndex) => Math.min(prevIndex + 1, sections.length - 1))} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-white bg-sky-600 hover:bg-sky-700 transition-all">
+                    <button onClick={() => setActiveSectionIndex((prevIndex) => Math.min(prevIndex + 1, sections.length - 1))} className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium text-white bg-sky-600 hover:bg-sky-700 transition-all cursor-pointer shadow-xs">
                       Next <ChevronRight className="size-3.5" />
                     </button>
                   )}
                 </div>
               </div>
 
+               {/*  Component Mounting*/}
               {/*  form content*/}
               <div className="space-y-6">
                 {activeSection.id === 'personal' && (
                   <PersonalInfoForm data={resumeData.personal_info || {}} onChange={(data) => setResumeData(prev => ({ ...prev, personal_info: data }))} removeBackground={removeBackground} setRemoveBackground={setRemoveBackground} />
                 )}
-
+                 {/*  summary content*/}
                 {activeSection.id === 'summary' && (
-                  <div className="space-y-2">
-                    <h3 className="text-base font-semibold text-gray-800">Professional Summary</h3>
-                    <textarea
-                      rows={6}
-                      className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                      placeholder="Write a compelling summary of your career and skills..."
-                      value={resumeData.professional_summary || ""}
-                      onChange={(e) => setResumeData(prev => ({ ...prev, professional_summary: e.target.value }))}
-                    />
-                  </div>
+                  <SummaryForm data={resumeData.professional_summary || ""} onChange={(summary) => setResumeData(prev => ({ ...prev, professional_summary: summary }))} />
                 )}
+                  {/*  experience content*/}
+                {activeSection.id === 'experience' && (
+                  <ExperienceForm data={resumeData.experience || []} onChange={(expData) => setResumeData(prev => ({ ...prev, experience: expData }))} />
+                )}
+                 {/*  education content*/}
+                 {activeSection.id === 'education' && (
+                  <EducationForm data={resumeData.education || []} onChange={(data) => setResumeData(prev => ({ ...prev, education: data }))} />
+                )}
+                {/*  Project content*/}
+                {(activeSection.id === 'projects' || activeSection.id === 'project') && (
+                  <ProjectForm data={resumeData.projects || resumeData.project || []} onChange={(data) => setResumeData(prev => ({ ...prev, projects: data, project: data }))} />
+                )}
+                {/*  Skills content*/}
+                {(activeSection.id === 'Skills' || activeSection.id === 'skills') && (
+                  <SkillsForm data={resumeData.skills || resumeData.skill || []} onChange={(data) => setResumeData(prev => ({ ...prev, skills: data }))} />
+                )}
+
+                  
+                <button 
+                  onClick={() => toast.promise(saveResume(), { loading: 'Saving changes...', success: 'Saved successfully!', error: 'Failed to save' })}
+                  className="w-full sm:w-auto bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white shadow-md shadow-sky-500/20 active:scale-[0.98] transition-all rounded-xl px-6 py-2.5 mt-6 text-sm font-medium cursor-pointer"
+                >
+                  Save Changes
+                </button>
+
+
+                {/*  reorder section*/}
 
                 {activeSection.id === 'reorder' && (
                   <div className="space-y-4">
@@ -180,7 +266,7 @@ const ResumeBuilder = () => {
                       <p className="text-xs text-gray-500 mt-0.5">Use the buttons to move any section up or down in your preview.</p>
                     </div>
 
-                   
+                      
 
                     {/* Reorderable Items List */}
                     <div className="space-y-2">
@@ -235,39 +321,74 @@ const ResumeBuilder = () => {
           </div>
           {/*Right panel- Preview */}
           <div className="lg:col-span-7 max-lg:mt-6">
-            <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200 shadow-xs mb-4">
-              <div className="flex items-center gap-2">
-                <Layout className="size-4 text-sky-600"/>
-                <span className="text-xs font-semibold text-gray-700">Template:</span>
-                <select
-                  value={resumeData.template || "classic"}
-                  onChange={(e) => setResumeData(prev => ({ ...prev, template: e.target.value }))}
-                  className="text-xs font-medium bg-gray-50 border border-gray-300 text-gray-800 rounded-md px-2.5 py-1 focus:ring-2 focus:ring-sky-500 focus:outline-none cursor-pointer"
-                >
-                  <option value="classic">Classic ATS</option>
-                  <option value="modern">Modern ATS</option>
-                  <option value="minimal">Minimal ATS</option>
-                  <option value="minimal-image">Minimal Image</option>
-                  <option value="executive">Executive ATS</option>
-                  <option value="tech">Tech / Engineer ATS</option>
-                  <option value="compact">Compact Single-Page ATS</option>
-                  <option value="creative-sidebar">Modern Sidebar ATS</option>
-                </select>
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-gray-200 shadow-xs mb-4">
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Layout className="size-4 text-sky-600"/>
+                  <span className="text-xs font-semibold text-gray-700">Template:</span>
+                  <select
+                    value={resumeData.template || "classic"}
+                    onChange={(e) => setResumeData(prev => ({ ...prev, template: e.target.value }))}
+                    className="text-xs font-medium bg-gray-50 border border-gray-300 text-gray-800 rounded-md px-2.5 py-1 focus:ring-2 focus:ring-sky-500 focus:outline-none cursor-pointer"
+                  >
+                    <option value="classic">Classic ATS</option>
+                    <option value="modern">Modern ATS</option>
+                    <option value="minimal">Minimal ATS</option>
+                    <option value="minimal-image">Minimal Image</option>
+                    <option value="executive">Executive ATS</option>
+                    <option value="tech">Tech / Engineer ATS</option>
+                    <option value="compact">Compact Single-Page ATS</option>
+                    <option value="creative-sidebar">Modern Sidebar ATS</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-gray-700">Color:</span>
+                  <div className="flex items-center gap-1">
+                    {['#3B82F6', '#1e3a8a', '#0284c7', '#0f766e', '#4f46e5', '#dc2626', '#059669', '#111827'].map(color => (
+                      <button
+                        key={color}
+                        onClick={() => setResumeData(prev => ({ ...prev, accent_color: color }))}
+                        className={`w-4 h-4 rounded-full border transition-all ${
+                          resumeData.accent_color === color ? 'ring-2 ring-sky-500 scale-110' : 'hover:scale-105'
+                        }`}
+                        style={{ backgroundColor: color }}
+                        title={`Set accent color ${color}`}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-700">Color:</span>
-                {['#3B82F6', '#1e3a8a', '#0284c7', '#0f766e', '#4f46e5', '#dc2626', '#059669', '#111827'].map(color => (
-                  <button
-                    key={color}
-                    onClick={() => setResumeData(prev => ({ ...prev, accent_color: color }))}
-                    className={`w-4 h-4 rounded-full border transition-all ${
-                      resumeData.accent_color === color ? 'ring-2 ring-sky-500 scale-110' : 'hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: color }}
-                    title={`Set accent color ${color}`}
-                  />
-                ))}
+                {resumeData.public && (
+                  <button 
+                    onClick={handleShare}
+                    className="flex items-center px-3 py-1.5 gap-1.5 text-xs font-medium bg-blue-50 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer"
+                    title="Share Resume"
+                  >
+                    <Share2Icon className="size-3.5"/>
+                    <span className="hidden sm:inline">Share</span>
+                  </button>
+                )}
+
+                <button 
+                  onClick={changeResumeVisibility}
+                  className="flex items-center px-3 py-1.5 gap-1.5 text-xs font-medium bg-purple-50 text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors cursor-pointer"
+                  title="Toggle Privacy"
+                >
+                  {resumeData.public ? <EyeIcon className="size-3.5"/> : <EyeOffIcon className="size-3.5"/>}
+                  <span>{resumeData.public ? 'Public' : 'Private'}</span>
+                </button>
+
+                <button 
+                  onClick={downloadResume}
+                  className="flex items-center px-3 py-1.5 gap-1.5 text-xs font-medium bg-sky-600 text-white rounded-lg hover:bg-sky-700 shadow-xs transition-colors cursor-pointer"
+                  title="Download / Print PDF"
+                >
+                  <DownloadIcon className="size-3.5"/>
+                  <span>Download</span>
+                </button>
               </div>
             </div>
 

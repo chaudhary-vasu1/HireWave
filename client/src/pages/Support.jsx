@@ -1,4 +1,3 @@
-import React from "react";
 import { Mail, Clock, HelpCircle, FileText, Download, Shield } from "lucide-react";
 
 const faqs = [

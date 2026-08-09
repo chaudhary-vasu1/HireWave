@@ -1,6 +1,5 @@
 import {Phone, Mail ,Globe ,User, MapPin, BriefcaseBusiness  } from 'lucide-react'
 import { FaLinkedin } from "react-icons/fa";
-import React from 'react'
 
 const PersonalInfoForm = ({data = {} , onChange ,removeBackground , setRemoveBackground}) => {
     const handleChange = (field ,value) =>{

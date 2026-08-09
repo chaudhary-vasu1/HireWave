@@ -41,9 +41,9 @@ const ATSPremiumResume = ({ data }) => {
 
     const rawProjects = data?.projects || data?.project || [];
     const projects = rawProjects.map(proj => ({
-        title: proj.title || "",
+        title: proj.title || proj.name || "",
         duration: proj.duration || "",
-        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || ""),
+        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || ""),
         points: Array.isArray(proj.points) ? proj.points : (proj.description ? [proj.description] : [])
     }));
 

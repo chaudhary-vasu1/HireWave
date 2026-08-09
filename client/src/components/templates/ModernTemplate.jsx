@@ -1,6 +1,6 @@
 import React from "react";
 
-const ModernATSResume = ({ data, resume }) => {
+const ModernATSResume = ({ data, resume, accentColor = "#3B82F6" }) => {
     const rawData = data || resume || {};
 
     const personalInfo = rawData?.personal_info || rawData?.personalInfo || {};
@@ -17,8 +17,8 @@ const ModernATSResume = ({ data, resume }) => {
     const experience = rawExperience.map(exp => ({
         position: exp.position || exp.role || "",
         company: exp.company || "",
-        startDate: exp.startDate || exp.startYear || "",
-        endDate: exp.endDate || exp.endYear || "Present",
+        startDate: exp.startDate || exp.start_date || exp.startYear || "",
+        endDate: exp.endDate || exp.end_date || exp.endYear || (exp.is_current ? "Present" : ""),
         description: Array.isArray(exp.description) 
             ? exp.description 
             : Array.isArray(exp.responsibilities) 
@@ -29,18 +29,18 @@ const ModernATSResume = ({ data, resume }) => {
 
     const rawEducation = rawData?.education || [];
     const education = rawEducation.map(edu => ({
-        degree: edu.degree || "",
+        degree: edu.degree ? (edu.field ? `${edu.degree} in ${edu.field}` : edu.degree) : (edu.field || ""),
         institute: edu.institute || edu.institution || edu.school || "",
-        year: edu.year || (edu.startYear && edu.endYear ? `${edu.startYear} - ${edu.endYear}` : (edu.startDate && edu.endDate ? `${edu.startDate} - ${edu.endDate}` : "")),
-        cgpa: edu.cgpa || ""
+        year: edu.graduation_date || edu.year || (edu.startYear && edu.endYear ? `${edu.startYear} - ${edu.endYear}` : (edu.startDate && edu.endDate ? `${edu.startDate} - ${edu.endDate}` : "")),
+        cgpa: edu.gpa || edu.cgpa || ""
     }));
 
     const rawProjects = rawData?.projects || rawData?.project || [];
     const projects = rawProjects.map(proj => ({
-        title: proj.title || "",
+        title: proj.title || proj.name || "",
         link: proj.link || proj.website || "",
         description: proj.description || "",
-        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || "")
+        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || "")
     }));
 
     const rawCertifications = rawData?.certifications || [];
@@ -55,7 +55,7 @@ const ModernATSResume = ({ data, resume }) => {
         <div className="max-w-4xl mx-auto bg-white text-gray-900 p-10 shadow-lg font-sans">
 
             {/* Header */}
-            <header className="border-b-2 border-gray-800 pb-5 mb-6">
+            <header className="border-b-2 pb-5 mb-6" style={{ borderColor: accentColor }}>
                 <h1 className="text-4xl font-bold uppercase tracking-wide">
                     {personalInfo.full_name}
                 </h1>

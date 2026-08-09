@@ -15,8 +15,8 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
     const experience = rawExperience.map(exp => ({
         position: exp.position || exp.role || "",
         company: exp.company || "",
-        startDate: exp.startDate || exp.startYear || "",
-        endDate: exp.endDate || exp.endYear || "Present",
+        startDate: exp.startDate || exp.start_date || exp.startYear || "",
+        endDate: exp.endDate || exp.end_date || exp.endYear || (exp.is_current ? "Present" : ""),
         description: Array.isArray(exp.description) 
             ? exp.description 
             : Array.isArray(exp.responsibilities) 
@@ -27,19 +27,19 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
 
     const rawEducation = data?.education || [];
     const education = rawEducation.map(edu => ({
-        degree: edu.degree || "",
+        degree: edu.degree ? (edu.field ? `${edu.degree} in ${edu.field}` : edu.degree) : (edu.field || ""),
         school: edu.school || edu.institute || edu.institution || "",
         startYear: edu.startYear || edu.startDate || "",
-        endYear: edu.endYear || edu.endDate || "",
-        cgpa: edu.cgpa || ""
+        endYear: edu.endYear || edu.endDate || edu.graduation_date || "",
+        cgpa: edu.gpa || edu.cgpa || ""
     }));
 
     const rawProjects = data?.projects || data?.project || [];
     const projects = rawProjects.map(proj => ({
-        title: proj.title || "",
+        title: proj.title || proj.name || "",
         link: proj.link || proj.website || "",
         description: proj.description || "",
-        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || "")
+        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || "")
     }));
 
     const rawCertifications = data?.certifications || [];

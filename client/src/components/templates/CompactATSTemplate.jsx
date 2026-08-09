@@ -36,10 +36,10 @@ const CompactATSTemplate = ({ data, accentColor = "#0f766e" }) => {
 
     const rawProjects = data?.projects || data?.project || [];
     const projects = rawProjects.map(proj => ({
-        title: proj.title || "",
+        title: proj.title || proj.name || "",
         link: proj.link || proj.website || "",
         description: proj.description || "",
-        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || "")
+        techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || "")
     }));
 
     const rawCertifications = data?.certifications || [];

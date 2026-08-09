@@ -1,31 +1,56 @@
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom'
+import { logout } from '../app/features/authSlice.js';
+
+import { Scan } from 'lucide-react';
 
 const Navbar = () => {
-    const user = {name : 'John Doe'}
+  const dispatch = useDispatch()
+    const {user} = useSelector(state => state.auth);
     const navigate = useNavigate();
 
     const logoutUser = () => {
       navigate('/');
+      dispatch(logout());
+
     } 
 
   return (
-    <div className=' shadow bg-white'>
-<nav className='flex items-center justify-between w-full  px-4 py-3.5 text-slate-800 transition all'>
+    <header className='sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all'>
+      <nav className='max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 text-slate-800'>
+        <Link to='/' className='flex items-center gap-2 group transition-transform active:scale-95'>
+          <img src='/logo.svg' alt='logo' className="h-8 w-auto transition-transform group-hover:scale-105" />
+        </Link>
 
-<Link to = '/'>
+        <div className='flex items-center gap-3 text-sm'>
+          {user && (
+            <Link 
+              to="/app/ats-scanner" 
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-sky-50 to-indigo-50 hover:from-sky-100 hover:to-indigo-100 text-sky-700 font-semibold rounded-full border border-sky-200/80 text-xs transition-all cursor-pointer shadow-2xs"
+            >
+              <Scan className="size-3.5 text-sky-600" />
+              <span>ATS Scanner</span>
+            </Link>
+          )}
 
-<img src = '/logo.svg' alt = 'logo' className="h-8 w-auto "/>
-</Link>
-
-<div className='flex items-center gap-4 text-sm'>
-    <p className='max-sm:hidden'> Hi , {user?.name}</p>
-    <button onClick = {logoutUser} className='bg-white hover:bg-slate-50 border border-gray-300 px-7 py-1.5 rounded-full active:scale-95 transition-all'>Logout</button>
-</div>
-
-</nav>
-
-    </div>
+          {user && (
+            <div className='max-sm:hidden flex items-center gap-2 px-3 py-1.5 bg-slate-100/80 rounded-full border border-slate-200/60 font-medium text-slate-700 text-xs shadow-2xs'>
+              <span className='w-6 h-6 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs'>
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+              </span>
+              <span>Hi, {user?.name}</span>
+            </div>
+          )}
+          <button 
+            onClick={logoutUser} 
+            className='bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 border border-gray-300 px-5 py-1.5 rounded-full font-medium active:scale-95 transition-all text-slate-700 text-xs shadow-2xs cursor-pointer'
+          >
+            Logout
+          </button>
+        </div>
+      </nav>
+    </header>
   )
 }
 
