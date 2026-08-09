@@ -147,14 +147,14 @@ const DashBoard = () => {
         </div>
 
 
-        <div className="flex flex-wrap gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 max-w-2xl gap-4">
 
           <button onClick={() => {
             setShowCreateResume(true)
-          }} className="w-full sm:max-w-40 h-52 bg-white rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center gap-3 group cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:border-sky-500 hover:shadow-xl hover:shadow-sky-200/50">
-            <PlusIcon className="size-12 p-3 rounded-full bg-gradient-to-br from-sky-300 via-sky-400 to-sky-500 text-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-90" />
+          }} className="w-full h-36 sm:h-52 bg-white rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 sm:gap-3 group cursor-pointer transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-2 hover:border-sky-500 hover:shadow-xl hover:shadow-sky-200/50">
+            <PlusIcon className="size-10 sm:size-12 p-2.5 sm:p-3 rounded-full bg-gradient-to-br from-sky-300 via-sky-400 to-sky-500 text-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-90" />
 
-            <p className="text-sm font-medium text-slate-600">
+            <p className="text-xs sm:text-sm font-medium text-slate-600">
               Create Resume
             </p>
           </button>
@@ -162,20 +162,20 @@ const DashBoard = () => {
 
           <button onClick={() => {
             setShowUploadResume(true)
-          }} className="w-full sm:max-w-40 h-52 bg-white rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center gap-3 group cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-200/50">
-            <UploadCloudIcon className="size-12 p-3 rounded-full bg-gradient-to-br from-sky-400 via-sky-500 to-indigo-600 text-white transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1" />
+          }} className="w-full h-36 sm:h-52 bg-white rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 sm:gap-3 group cursor-pointer transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-2 hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-200/50">
+            <UploadCloudIcon className="size-10 sm:size-12 p-2.5 sm:p-3 rounded-full bg-gradient-to-br from-sky-400 via-sky-500 to-indigo-600 text-white transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1" />
 
-            <p className="text-sm font-medium text-slate-600">
+            <p className="text-xs sm:text-sm font-medium text-slate-600">
               Upload Existing
             </p>
           </button>
 
           <button onClick={() => {
             navigate('/app/ats-scanner')
-          }} className="w-full sm:max-w-40 h-52 bg-white rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center gap-3 group cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:border-purple-500 hover:shadow-xl hover:shadow-purple-200/50">
-            <Scan className="size-12 p-3 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white transition-all duration-300 group-hover:scale-110" />
+          }} className="w-full h-36 sm:h-52 bg-white rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 sm:gap-3 group cursor-pointer transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-2 hover:border-purple-500 hover:shadow-xl hover:shadow-purple-200/50">
+            <Scan className="size-10 sm:size-12 p-2.5 sm:p-3 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white transition-all duration-300 group-hover:scale-110" />
 
-            <p className="text-sm font-medium text-slate-600">
+            <p className="text-xs sm:text-sm font-medium text-slate-600">
               ATS Scanner
             </p>
           </button>
@@ -184,14 +184,14 @@ const DashBoard = () => {
         <hr className="my-8 border-slate-200" />
 
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-5">
           {allResumes.map((resume, index) => {
             const baseColor = colors[index % colors.length];
 
             return (
               <div
                 key={index} onClick={() => navigate(`/app/builder/${resume._id}`)}
-                className="relative h-56 rounded-2xl overflow-hidden border bg-white group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+                className="relative h-48 sm:h-56 rounded-2xl overflow-hidden border bg-white group transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
                 style={{
                   borderColor: `${baseColor}30`,
                 }}
@@ -211,7 +211,7 @@ const DashBoard = () => {
                 />
 
 
-                <div onClick={(e) => e.stopPropagation()} className="absolute top-3 right-3 hidden group-hover:flex gap-2 z-20">
+                <div onClick={(e) => e.stopPropagation()} className="absolute top-3 right-3 flex lg:hidden lg:group-hover:flex gap-2 z-20">
                   
                   <button
                   type="button"

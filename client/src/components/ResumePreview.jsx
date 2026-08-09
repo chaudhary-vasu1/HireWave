@@ -31,8 +31,8 @@ const ResumePreview = ({data , template , accentColor , classes = ''}) => {
 }
     } 
     return (
-    <div className='w-full bg-gray-100'>
-      <div id = 'resume-preview' className={`border border-gray-200 print:shadow-none print:border-none ${classes}`}>
+    <div className='w-full bg-gray-100 overflow-x-auto max-w-full rounded-lg'>
+      <div id = 'resume-preview' className={`border border-gray-200 print:shadow-none print:border-none min-w-[320px] sm:min-w-0 ${classes}`}>
         {renderTemplate()}
       </div>
       <style >

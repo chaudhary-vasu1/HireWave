@@ -80,6 +80,7 @@ const ResumeBuilder = () => {
 
   const [activeSectionIndex, setActiveSectionIndex] = useState(0)
   const [removeBackground, setRemoveBackground] = useState(false)
+  const [mobileTab, setMobileTab] = useState('editor')
 
   const sections = [
     { id: 'personal', name: 'Personal Info', icon: User },
@@ -171,23 +172,47 @@ navigator.share({url:resumeUrl , text: "My Resume" ,})
 
   return (
     <div>
-      <div className='max-w-7xl mx-auto px-4 py-6 '>
-        <Link to={'/app'} className='inline-flex gap-2 items-center text-slate-500 hover:text-slate-700 transition-all'>
-          <ArrowLeftIcon className='size-4 -ml-9' /> Back to DashBoard
+      <div className='max-w-7xl mx-auto px-4 py-4 sm:py-6 '>
+        <Link to={'/app'} className='inline-flex gap-2 items-center text-slate-500 hover:text-slate-700 transition-all text-sm'>
+          <ArrowLeftIcon className='size-4' /> Back to Dashboard
         </Link>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 pb-8">
+        {/* Mobile View Switcher (Phone Compatibility) */}
+        <div className="lg:hidden flex mb-4 bg-slate-200/80 p-1 rounded-xl shadow-inner">
+          <button 
+            onClick={() => setMobileTab('editor')} 
+            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+              mobileTab === 'editor' 
+                ? 'bg-white text-sky-700 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Edit Resume Form
+          </button>
+          <button 
+            onClick={() => setMobileTab('preview')} 
+            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+              mobileTab === 'preview' 
+                ? 'bg-white text-sky-700 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Live Preview & Download
+          </button>
+        </div>
+
         <div className="grid lg:grid-cols-12 gap-8">
           {/*Left panel- Form */}
-          <div className="relative lg:col-span-5 rounded-lg overflow-hidden">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 pt-1">
+          <div className={`relative lg:col-span-5 rounded-lg overflow-hidden ${mobileTab === 'preview' ? 'max-lg:hidden' : ''}`}>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 pt-1">
               {/* progress bar using activesectionindex */}
               <hr className="absolute top-0 left-0 right-0 border-2 border-gray-200" />
               <hr className="absolute top-0 left-0 h-1 bg-gradient-to-r from-sky-500 to-sky-600 border-none transition-all duration-2000" style={{ width: `${activeSectionIndex * 100 / (sections.length - 1)}%` }} />
 
-              {/* Section Tabs Selector */}
-              <div className="flex flex-wrap gap-1.5 py-3 mb-4 border-b border-gray-200">
+              {/* Section Tabs Selector - Touch Scrollable on Mobile */}
+              <div className="flex overflow-x-auto gap-1.5 py-3 mb-4 border-b border-gray-200 scrollbar-none flex-nowrap -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
                 {sections.map((sec, idx) => {
                   const Icon = sec.icon;
                   const isActive = idx === activeSectionIndex;
@@ -195,7 +220,7 @@ navigator.share({url:resumeUrl , text: "My Resume" ,})
                     <button
                       key={sec.id}
                       onClick={() => setActiveSectionIndex(idx)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer ${
                         isActive 
                           ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-sm shadow-sky-500/20' 
                           : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
@@ -341,7 +366,7 @@ navigator.share({url:resumeUrl , text: "My Resume" ,})
             </div>
           </div>
           {/*Right panel- Preview */}
-          <div className="lg:col-span-7 max-lg:mt-6">
+          <div className={`lg:col-span-7 max-lg:mt-0 ${mobileTab === 'editor' ? 'max-lg:hidden' : ''}`}>
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-gray-200 shadow-xs mb-4">
               <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
