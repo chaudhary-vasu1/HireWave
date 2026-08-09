@@ -60,10 +60,14 @@ const DashBoard = () => {
 
   const uploadResume = async (event) => {
     event.preventDefault();
+    if (!resume) {
+      toast.error("Please select a PDF resume file to upload.");
+      return;
+    }
     setIsLoading(true)
     try {
        const resumeText = await pdfToText(resume);
-        const {data} = await api.post('/api/ai/upload' ,{title , resumeText} ,{headers:{
+        const {data} = await api.post('/api/ai/upload-resume' ,{title , resumeText} ,{headers:{
           Authorization:token
          }})
 

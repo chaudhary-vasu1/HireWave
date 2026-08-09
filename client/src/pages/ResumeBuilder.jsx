@@ -150,7 +150,7 @@ navigator.share({url:resumeUrl , text: "My Resume" ,})
       removeBackground && formData.append("removeBackground" , "yes");
       typeof resumeData.personal_info.image === 'object' && formData.append("image" , resumeData.personal_info.image);
 
-      const {data} = await api.put('/api/resume/update' , formData , {headers:{
+      const {data} = await api.put('/api/resumes/update' , formData , {headers:{
         Authorization:token}})
 
         setResumeData(data.resume);
