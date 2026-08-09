@@ -4,11 +4,13 @@ const CreativeModernATSTemplate = ({ data, accentColor = "#4f46e5" }) => {
     const personalInfo = data?.personal_info || data?.personalInfo || {};
     const summary = data?.professional_summary || data?.summary || "";
 
+    const hiddenSections = new Set(data?.hidden_sections || []);
+
     let skills = [];
     if (Array.isArray(data?.skills)) {
-        skills = data.skills;
+        skills = data.skills.filter(s => typeof s === 'string' && s.trim().length > 0);
     } else if (data?.skills && typeof data.skills === 'object') {
-        skills = Object.values(data.skills).flat();
+        skills = Object.values(data.skills).flat().filter(s => typeof s === 'string' && s.trim().length > 0);
     }
 
     const rawExperience = data?.experience || [];
@@ -17,13 +19,13 @@ const CreativeModernATSTemplate = ({ data, accentColor = "#4f46e5" }) => {
         company: exp.company || "",
         startDate: exp.startDate || exp.start_date || exp.startYear || "",
         endDate: exp.endDate || exp.end_date || exp.endYear || (exp.is_current ? "Present" : ""),
-        description: Array.isArray(exp.description) 
+        description: (Array.isArray(exp.description) 
             ? exp.description 
             : Array.isArray(exp.responsibilities) 
             ? exp.responsibilities 
             : exp.description ? [exp.description] 
-            : exp.responsibilities ? [exp.responsibilities] : []
-    }));
+            : exp.responsibilities ? [exp.responsibilities] : []).filter(item => typeof item === 'string' && item.trim().length > 0)
+    })).filter(exp => exp.position.trim() || exp.company.trim() || exp.description.length > 0);
 
     const rawEducation = data?.education || [];
     const education = rawEducation.map(edu => ({
@@ -32,7 +34,7 @@ const CreativeModernATSTemplate = ({ data, accentColor = "#4f46e5" }) => {
         startYear: edu.startYear || edu.startDate || "",
         endYear: edu.endYear || edu.endDate || edu.graduation_date || "",
         cgpa: edu.gpa || edu.cgpa || ""
-    }));
+    })).filter(edu => edu.degree.trim() || edu.school.trim());
 
     const rawProjects = data?.projects || data?.project || [];
     const projects = rawProjects.map(proj => ({
@@ -40,15 +42,15 @@ const CreativeModernATSTemplate = ({ data, accentColor = "#4f46e5" }) => {
         link: proj.link || proj.website || "",
         description: proj.description || "",
         techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || "")
-    }));
+    })).filter(proj => proj.title.trim() || proj.description.trim() || proj.link.trim());
 
     const rawCertifications = data?.certifications || [];
-    const certifications = rawCertifications.map(cert => 
-        typeof cert === 'string' ? cert : [cert.title, cert.issuer, cert.year].filter(Boolean).join(" - ")
-    );
+    const certifications = rawCertifications
+        .map(cert => typeof cert === 'string' ? cert.trim() : [cert.title, cert.issuer, cert.year].filter(Boolean).join(" - ").trim())
+        .filter(cert => cert.length > 0);
 
-    const achievements = data?.achievements || [];
-    const languages = data?.languages || [];
+    const achievements = (data?.achievements || []).filter(a => typeof a === 'string' && a.trim().length > 0);
+    const languages = (data?.languages || []).filter(l => typeof l === 'string' && l.trim().length > 0);
 
     const formatUrl = (url) => {
         if (!url) return '';
@@ -58,14 +60,14 @@ const CreativeModernATSTemplate = ({ data, accentColor = "#4f46e5" }) => {
         return `https://${url}`;
     };
 
-    // Separate sidebar items (contact, skills, education, certifications, languages) vs main content items (summary, experience, projects, achievements)
+    // Separate sidebar items vs main content items
     const sidebarSectionKeys = new Set(['skills', 'education', 'certifications', 'languages']);
 
     const defaultOrder = ['summary', 'experience', 'projects', 'skills', 'education', 'certifications', 'achievements', 'languages'];
     const currentOrder = data?.sections_order || defaultOrder;
 
-    const mainSectionsOrder = currentOrder.filter(k => !sidebarSectionKeys.has(k));
-    const sidebarSectionsOrder = currentOrder.filter(k => sidebarSectionKeys.has(k));
+    const mainSectionsOrder = currentOrder.filter(k => !sidebarSectionKeys.has(k) && !hiddenSections.has(k));
+    const sidebarSectionsOrder = currentOrder.filter(k => sidebarSectionKeys.has(k) && !hiddenSections.has(k));
 
     return (
         <div className="max-w-[850px] mx-auto bg-white text-slate-900 font-sans shadow-md overflow-hidden">

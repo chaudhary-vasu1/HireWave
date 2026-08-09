@@ -60,7 +60,8 @@ const ResumeSchema = new mongoose.Schema({
      sections_order: {
         type: [{ type: String }],
         default: ['summary', 'skills', 'experience', 'education', 'projects', 'certifications', 'achievements', 'languages']
-     }
+     },
+     hidden_sections: [{ type: String }]
 
 },{timestamps:true , minimize:false} )
 

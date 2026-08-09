@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import dummyResumeData from '../assets/assets'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeftIcon, Briefcase, ChevronLeft, ChevronRight, FileText, FolderIcon, GraduationCap, Sparkles, User, ArrowUp, ArrowDown, ArrowUpDown, Layout, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon, Form, Award, Trophy, Globe } from 'lucide-react'
+import { ArrowLeftIcon, Briefcase, ChevronLeft, ChevronRight, FileText, FolderIcon, GraduationCap, Sparkles, User, ArrowUp, ArrowDown, ArrowUpDown, Layout, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon, Form, Award, Trophy, Globe, Eye, EyeOff } from 'lucide-react'
 import PersonalInfoForm from "../components/PersonalInfoForm";
 import SummaryForm from "../components/SummaryForm";
 import ExperienceForm from "../components/ExperienceForm";
@@ -54,6 +54,7 @@ const ResumeBuilder = () => {
     certifications: [],
     achievements: [],
     languages: [],
+    hidden_sections: [],
     template: "classic",
     accent_color: '#3B82F6',
     public: false,
@@ -114,6 +115,14 @@ const ResumeBuilder = () => {
     newOrder[index] = newOrder[index + 1];
     newOrder[index + 1] = temp;
     setResumeData(prev => ({ ...prev, sections_order: newOrder }));
+  };
+
+  const toggleSectionVisibility = (secKey) => {
+    const hidden = resumeData.hidden_sections || [];
+    const newHidden = hidden.includes(secKey)
+      ? hidden.filter(k => k !== secKey)
+      : [...hidden, secKey];
+    setResumeData(prev => ({ ...prev, hidden_sections: newHidden }));
   };
 
   const changeResumeVisibility = async () => { 
@@ -308,57 +317,78 @@ navigator.share({url:resumeUrl , text: "My Resume" ,})
                 {activeSection.id === 'reorder' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-base font-semibold text-gray-800">Reorder Resume Sections</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">Use the buttons to move any section up or down in your preview.</p>
+                      <h3 className="text-base font-semibold text-gray-800">Reorder & Toggle Resume Sections</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">Move sections up/down or toggle visibility. Hidden or empty sections leave zero space on your resume.</p>
                     </div>
-
-                      
 
                     {/* Reorderable Items List */}
                     <div className="space-y-2">
-                      {currentOrder.map((secKey, idx) => (
-                        <div
-                          key={secKey}
-                          className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-xs hover:border-sky-300 transition-all"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 flex items-center justify-center bg-sky-100 text-sky-700 text-xs font-bold rounded-full">
-                              {idx + 1}
-                            </span>
-                            <span className="text-xs font-medium text-gray-800">
-                              {sectionLabels[secKey] || secKey}
-                            </span>
-                          </div>
+                      {currentOrder.map((secKey, idx) => {
+                        const isHidden = (resumeData.hidden_sections || []).includes(secKey);
 
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => moveSectionUp(idx)}
-                              disabled={idx === 0}
-                              title="Move Section Up"
-                              className={`p-1.5 rounded-md text-xs border transition-all ${
-                                idx === 0 
-                                  ? 'text-gray-300 border-gray-100 bg-gray-50 cursor-not-allowed' 
-                                  : 'text-gray-600 border-gray-200 hover:bg-sky-50 hover:text-sky-600 hover:border-sky-300'
-                              }`}
-                            >
-                              <ArrowUp className="size-3.5" />
-                            </button>
+                        return (
+                          <div
+                            key={secKey}
+                            className={`flex items-center justify-between p-3 border rounded-lg shadow-xs transition-all ${
+                              isHidden ? 'bg-slate-50 border-slate-200 opacity-75' : 'bg-white border-gray-200 hover:border-sky-300'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 flex items-center justify-center bg-sky-100 text-sky-700 text-xs font-bold rounded-full">
+                                {idx + 1}
+                              </span>
+                              <span className={`text-xs font-medium ${isHidden ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+                                {sectionLabels[secKey] || secKey}
+                              </span>
+                              {isHidden && (
+                                <span className="text-[10px] font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                                  Hidden
+                                </span>
+                              )}
+                            </div>
 
-                            <button
-                              onClick={() => moveSectionDown(idx)}
-                              disabled={idx === currentOrder.length - 1}
-                              title="Move Section Down"
-                              className={`p-1.5 rounded-md text-xs border transition-all ${
-                                idx === currentOrder.length - 1 
-                                  ? 'text-gray-300 border-gray-100 bg-gray-50 cursor-not-allowed' 
-                                  : 'text-gray-600 border-gray-200 hover:bg-sky-50 hover:text-sky-600 hover:border-sky-300'
-                              }`}
-                            >
-                              <ArrowDown className="size-3.5" />
-                            </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => toggleSectionVisibility(secKey)}
+                                title={isHidden ? "Show section on resume" : "Hide section from resume"}
+                                className={`p-1.5 rounded-md text-xs border transition-all cursor-pointer ${
+                                  isHidden
+                                    ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'
+                                    : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'
+                                }`}
+                              >
+                                {isHidden ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                              </button>
+
+                              <button
+                                onClick={() => moveSectionUp(idx)}
+                                disabled={idx === 0}
+                                title="Move Section Up"
+                                className={`p-1.5 rounded-md text-xs border transition-all ${
+                                  idx === 0 
+                                    ? 'text-gray-300 border-gray-100 bg-gray-50 cursor-not-allowed' 
+                                    : 'text-gray-600 border-gray-200 hover:bg-sky-50 hover:text-sky-600 hover:border-sky-300 cursor-pointer'
+                                }`}
+                              >
+                                <ArrowUp className="size-3.5" />
+                              </button>
+
+                              <button
+                                onClick={() => moveSectionDown(idx)}
+                                disabled={idx === currentOrder.length - 1}
+                                title="Move Section Down"
+                                className={`p-1.5 rounded-md text-xs border transition-all ${
+                                  idx === currentOrder.length - 1 
+                                    ? 'text-gray-300 border-gray-100 bg-gray-50 cursor-not-allowed' 
+                                    : 'text-gray-600 border-gray-200 hover:bg-sky-50 hover:text-sky-600 hover:border-sky-300 cursor-pointer'
+                                }`}
+                              >
+                                <ArrowDown className="size-3.5" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}

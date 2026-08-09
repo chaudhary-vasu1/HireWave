@@ -4,12 +4,14 @@ const TechProfessionalTemplate = ({ data, accentColor = "#0284c7" }) => {
     const personalInfo = data?.personal_info || data?.personalInfo || {};
     const summary = data?.professional_summary || data?.summary || "";
 
+    const hiddenSections = new Set(data?.hidden_sections || []);
+
     let skillsObj = {};
     let skillsList = [];
     if (data?.skills && typeof data.skills === 'object' && !Array.isArray(data.skills)) {
         skillsObj = data.skills;
     } else if (Array.isArray(data?.skills)) {
-        skillsList = data.skills;
+        skillsList = data.skills.filter(s => typeof s === 'string' && s.trim().length > 0);
     }
 
     const rawExperience = data?.experience || [];
@@ -18,13 +20,13 @@ const TechProfessionalTemplate = ({ data, accentColor = "#0284c7" }) => {
         company: exp.company || "",
         startDate: exp.startDate || exp.startYear || "",
         endDate: exp.endDate || exp.endYear || "Present",
-        description: Array.isArray(exp.description) 
+        description: (Array.isArray(exp.description) 
             ? exp.description 
             : Array.isArray(exp.responsibilities) 
             ? exp.responsibilities 
             : exp.description ? [exp.description] 
-            : exp.responsibilities ? [exp.responsibilities] : []
-    }));
+            : exp.responsibilities ? [exp.responsibilities] : []).filter(item => typeof item === 'string' && item.trim().length > 0)
+    })).filter(exp => exp.position.trim() || exp.company.trim() || exp.description.length > 0);
 
     const rawEducation = data?.education || [];
     const education = rawEducation.map(edu => ({
@@ -33,7 +35,7 @@ const TechProfessionalTemplate = ({ data, accentColor = "#0284c7" }) => {
         startYear: edu.startYear || edu.startDate || "",
         endYear: edu.endYear || edu.endDate || "",
         cgpa: edu.cgpa || ""
-    }));
+    })).filter(edu => edu.degree.trim() || edu.school.trim());
 
     const rawProjects = data?.projects || data?.project || [];
     const projects = rawProjects.map(proj => ({
@@ -41,15 +43,15 @@ const TechProfessionalTemplate = ({ data, accentColor = "#0284c7" }) => {
         link: proj.link || proj.website || "",
         description: proj.description || "",
         techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || "")
-    }));
+    })).filter(proj => proj.title.trim() || proj.description.trim() || proj.link.trim());
 
     const rawCertifications = data?.certifications || [];
-    const certifications = rawCertifications.map(cert => 
-        typeof cert === 'string' ? cert : [cert.title, cert.issuer, cert.year].filter(Boolean).join(" - ")
-    );
+    const certifications = rawCertifications
+        .map(cert => typeof cert === 'string' ? cert.trim() : [cert.title, cert.issuer, cert.year].filter(Boolean).join(" - ").trim())
+        .filter(cert => cert.length > 0);
 
-    const achievements = data?.achievements || [];
-    const languages = data?.languages || [];
+    const achievements = (data?.achievements || []).filter(a => typeof a === 'string' && a.trim().length > 0);
+    const languages = (data?.languages || []).filter(l => typeof l === 'string' && l.trim().length > 0);
 
     const formatUrl = (url) => {
         if (!url) return '';
@@ -227,7 +229,7 @@ const TechProfessionalTemplate = ({ data, accentColor = "#0284c7" }) => {
 
                 const defaultOrder = ['summary', 'skills', 'experience', 'projects', 'education', 'certifications', 'achievements', 'languages'];
                 const sectionOrder = data?.sections_order || defaultOrder;
-                return sectionOrder.map(secKey => renderSectionMap[secKey]);
+                return sectionOrder.filter(secKey => !hiddenSections.has(secKey)).map(secKey => renderSectionMap[secKey]);
             })()}
         </div>
     );

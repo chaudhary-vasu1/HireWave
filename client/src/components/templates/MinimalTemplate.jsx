@@ -4,16 +4,23 @@ const ATSPremiumResume = ({ data }) => {
     const personalInfo = data?.personal_info || data?.personalInfo || {};
     const summary = data?.professional_summary || data?.summary || "";
     
+    const hiddenSections = new Set(data?.hidden_sections || []);
+    
     let skills = {};
     if (data?.skills && typeof data.skills === 'object' && !Array.isArray(data.skills)) {
         skills = Object.fromEntries(
-            Object.entries(data.skills).map(([key, val]) => [
-                key,
-                Array.isArray(val) ? val.join(", ") : String(val)
-            ])
+            Object.entries(data.skills)
+                .map(([key, val]) => [
+                    key,
+                    Array.isArray(val) ? val.filter(s => typeof s === 'string' && s.trim().length > 0).join(", ") : String(val).trim()
+                ])
+                .filter(([_, val]) => val.length > 0)
         );
     } else if (Array.isArray(data?.skills)) {
-        skills = { "Skills": data.skills.join(", ") };
+        const cleanSkills = data.skills.filter(s => typeof s === 'string' && s.trim().length > 0);
+        if (cleanSkills.length > 0) {
+            skills = { "Skills": cleanSkills.join(", ") };
+        }
     }
 
     const rawExperience = data?.experience || [];
@@ -22,13 +29,13 @@ const ATSPremiumResume = ({ data }) => {
         company: exp.company || "",
         startDate: exp.startDate || exp.startYear || "",
         endDate: exp.endDate || exp.endYear || "Present",
-        description: Array.isArray(exp.description) 
+        description: (Array.isArray(exp.description) 
             ? exp.description 
             : Array.isArray(exp.responsibilities) 
             ? exp.responsibilities 
             : exp.description ? [exp.description] 
-            : exp.responsibilities ? [exp.responsibilities] : []
-    }));
+            : exp.responsibilities ? [exp.responsibilities] : []).filter(item => typeof item === 'string' && item.trim().length > 0)
+    })).filter(exp => exp.position.trim() || exp.company.trim() || exp.description.length > 0);
 
     const rawEducation = data?.education || [];
     const education = rawEducation.map(edu => ({
@@ -37,22 +44,22 @@ const ATSPremiumResume = ({ data }) => {
         startYear: edu.startYear || edu.startDate || "",
         endYear: edu.endYear || edu.endDate || "",
         cgpa: edu.cgpa || ""
-    }));
+    })).filter(edu => edu.degree.trim() || edu.school.trim());
 
     const rawProjects = data?.projects || data?.project || [];
     const projects = rawProjects.map(proj => ({
         title: proj.title || proj.name || "",
         duration: proj.duration || "",
         techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || ""),
-        points: Array.isArray(proj.points) ? proj.points : (proj.description ? [proj.description] : [])
-    }));
+        points: (Array.isArray(proj.points) ? proj.points : (proj.description ? [proj.description] : [])).filter(item => typeof item === 'string' && item.trim().length > 0)
+    })).filter(proj => proj.title.trim() || proj.points.length > 0);
 
     const rawCertifications = data?.certifications || [];
-    const certifications = rawCertifications.map(cert => 
-        typeof cert === 'string' ? cert : [cert.title, cert.issuer, cert.year].filter(Boolean).join(" - ")
-    );
+    const certifications = rawCertifications
+        .map(cert => typeof cert === 'string' ? cert.trim() : [cert.title, cert.issuer, cert.year].filter(Boolean).join(" - ").trim())
+        .filter(cert => cert.length > 0);
 
-    const achievements = data?.achievements || [];
+    const achievements = (data?.achievements || []).filter(a => typeof a === 'string' && a.trim().length > 0);
 
     const formatUrl = (url) => {
         if (!url) return '';
@@ -191,7 +198,7 @@ const ATSPremiumResume = ({ data }) => {
 
                 const defaultOrder = ['summary', 'skills', 'experience', 'education', 'projects', 'certifications', 'achievements'];
                 const sectionOrder = data?.sections_order || defaultOrder;
-                return sectionOrder.map(secKey => renderSectionMap[secKey]);
+                return sectionOrder.filter(secKey => !hiddenSections.has(secKey)).map(secKey => renderSectionMap[secKey]);
             })()}
         </div>
     );
