@@ -12,6 +12,9 @@ const ProjectForm = ({ data = [], onChange }) => {
             type: '',
             techStack: '',
             link: '',
+            website: '',
+            github: '',
+            github_link: '',
             description: ''
         };
         onChange([...projectList, newProject]);
@@ -39,6 +42,10 @@ const ProjectForm = ({ data = [], onChange }) => {
             updatedItem.link = value;
             updatedItem.website = value;
         }
+        if (field === 'github' || field === 'github_link') {
+            updatedItem.github = value;
+            updatedItem.github_link = value;
+        }
 
         updated[index] = updatedItem;
         onChange(updated);
@@ -64,7 +71,8 @@ const ProjectForm = ({ data = [], onChange }) => {
                 {projectList.map((project, index) => {
                     const titleVal = project.title || project.name || '';
                     const techVal = Array.isArray(project.techStack) ? project.techStack.join(', ') : (project.techStack || project.type || '');
-                    const linkVal = project.link || project.website || '';
+                    const linkVal = project.link || project.website || project.live_demo || '';
+                    const githubVal = project.github || project.github_link || project.githubUrl || '';
                     const descVal = project.description || '';
 
                     return (
@@ -98,8 +106,15 @@ const ProjectForm = ({ data = [], onChange }) => {
                                     value={linkVal} 
                                     onChange={(e) => updateProject(index, "link", e.target.value)} 
                                     type="text" 
-                                    placeholder='Project Link / URL' 
-                                    className='px-3 py-2 text-sm border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:outline-none rounded-lg col-span-full' 
+                                    placeholder='Live Demo / Project Link (e.g. https://my-app.com)' 
+                                    className='px-3 py-2 text-sm border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:outline-none rounded-lg' 
+                                />
+                                <input 
+                                    value={githubVal} 
+                                    onChange={(e) => updateProject(index, "github", e.target.value)} 
+                                    type="text" 
+                                    placeholder='GitHub Repo Link (e.g. https://github.com/user/repo)' 
+                                    className='px-3 py-2 text-sm border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:outline-none rounded-lg' 
                                 />
                                 <textarea 
                                     rows={3} 

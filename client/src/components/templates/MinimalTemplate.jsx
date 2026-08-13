@@ -49,10 +49,12 @@ const ATSPremiumResume = ({ data }) => {
     const rawProjects = data?.projects || data?.project || [];
     const projects = rawProjects.map(proj => ({
         title: proj.title || proj.name || "",
+        link: proj.link || proj.website || proj.live_demo || "",
+        github: proj.github || proj.github_link || proj.githubUrl || proj.repo || "",
         duration: proj.duration || "",
         techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || ""),
         points: (Array.isArray(proj.points) ? proj.points : (proj.description ? [proj.description] : [])).filter(item => typeof item === 'string' && item.trim().length > 0)
-    })).filter(proj => proj.title.trim() || proj.points.length > 0);
+    })).filter(proj => proj.title.trim() || proj.points.length > 0 || proj.link.trim() || proj.github.trim());
 
     const rawCertifications = data?.certifications || [];
     const certifications = rawCertifications
@@ -138,11 +140,24 @@ const ATSPremiumResume = ({ data }) => {
                         <Section key="projects" title="Projects">
                             {projects.map((project, index) => (
                                 <div key={index} className="mb-5">
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between flex-wrap gap-1">
                                         <h3 className="font-semibold">
                                             {project.title}
                                         </h3>
-                                        <span>{project.duration}</span>
+                                        <div className="flex items-center gap-2 text-xs">
+                                            {project.link && (
+                                                <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+                                                    {project.link}
+                                                </a>
+                                            )}
+                                            {project.link && project.github && <span className="text-gray-400">|</span>}
+                                            {project.github && (
+                                                <a href={formatUrl(project.github)} target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:underline font-mono">
+                                                    {project.github}
+                                                </a>
+                                            )}
+                                            {project.duration && <span className="ml-1">{project.duration}</span>}
+                                        </div>
                                     </div>
                                     {project.techStack && (
                                         <p>

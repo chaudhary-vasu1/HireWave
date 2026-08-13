@@ -1,5 +1,5 @@
 import {Phone, Mail ,Globe ,User, MapPin, BriefcaseBusiness  } from 'lucide-react'
-import { FaLinkedin } from "react-icons/fa";
+import { FaLinkedin, FaGithub } from "react-icons/fa";
 
 const PersonalInfoForm = ({data = {} , onChange ,removeBackground , setRemoveBackground}) => {
     const handleChange = (field ,value) =>{
@@ -13,6 +13,7 @@ const PersonalInfoForm = ({data = {} , onChange ,removeBackground , setRemoveBac
       {key: "location", label: "Location", icon: MapPin, type: "text"},
       {key: "profession", label: "Profession", icon: BriefcaseBusiness, type: "text"},
       {key: "linkedin", label: "LinkedIn Profile", icon:  FaLinkedin , type: "url"}, 
+      {key: "github", label: "GitHub Profile", icon:  FaGithub , type: "url"}, 
       {key: "website", label: "Personal Website", icon: Globe, type: "url"},  
      ]
     return (

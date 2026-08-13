@@ -39,10 +39,11 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
     const rawProjects = data?.projects || data?.project || [];
     const projects = rawProjects.map(proj => ({
         title: proj.title || proj.name || "",
-        link: proj.link || proj.website || "",
+        link: proj.link || proj.website || proj.live_demo || "",
+        github: proj.github || proj.github_link || proj.githubUrl || proj.repo || "",
         description: proj.description || "",
         techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || "")
-    })).filter(proj => proj.title.trim() || proj.description.trim() || proj.link.trim());
+    })).filter(proj => proj.title.trim() || proj.description.trim() || proj.link.trim() || proj.github.trim());
 
     const rawCertifications = data?.certifications || [];
     const certifications = rawCertifications
@@ -146,11 +147,19 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
                                         <h3 className="font-bold text-sm text-slate-900">
                                             {project.title}
                                         </h3>
-                                        {project.link && (
-                                            <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-700 hover:underline font-medium">
-                                                {project.link}
-                                            </a>
-                                        )}
+                                        <div className="flex items-center gap-2 text-xs font-medium">
+                                            {project.link && (
+                                                <a href={formatUrl(project.link)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+                                                    {project.link}
+                                                </a>
+                                            )}
+                                            {project.link && project.github && <span className="text-slate-400">|</span>}
+                                            {project.github && (
+                                                <a href={formatUrl(project.github)} target="_blank" rel="noopener noreferrer" className="text-slate-700 hover:underline">
+                                                    {project.github}
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
                                     <p className="text-xs text-slate-800 mt-1 font-sans">{project.description}</p>
                                     {project.techStack && (

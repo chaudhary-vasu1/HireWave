@@ -88,6 +88,7 @@ Provide data in EXACTLY the following JSON format with no extra markdown or wrap
     "phone": "+1234567890",
     "location": "City, Country",
     "linkedin": "linkedin.com/in/username",
+    "github": "github.com/username",
     "website": "portfolio.com"
   },
   "experience": [
@@ -103,8 +104,10 @@ Provide data in EXACTLY the following JSON format with no extra markdown or wrap
   "projects": [
     {
       "name": "Project Name",
-      "type": "Web App",
-      "description": "Project overview and features"
+      "type": "Web App / Tech Stack",
+      "description": "Project overview and features",
+      "link": "Live demo or project link URL if present in resume text",
+      "github": "GitHub repository URL if present in resume text"
     }
   ],
   "education": [
@@ -152,6 +155,28 @@ if (Array.isArray(parsedData.certifications)) {
   parsedData.certifications = parsedData.certifications.map(cert => 
     typeof cert === 'string' ? { title: cert, issuer: '', year: '' } : cert
   );
+}
+
+// Normalize projects to ensure link and github fields are preserved and mirrored
+if (Array.isArray(parsedData.projects)) {
+  parsedData.projects = parsedData.projects.map(proj => {
+    const title = proj.name || proj.title || '';
+    const techStack = proj.techStack || proj.type || '';
+    const link = proj.link || proj.website || proj.live_demo || proj.demo || '';
+    const github = proj.github || proj.github_link || proj.githubUrl || proj.repo || '';
+    return {
+      ...proj,
+      name: title,
+      title: title,
+      type: techStack,
+      techStack: techStack,
+      link: link,
+      website: link,
+      github: github,
+      github_link: github,
+      description: proj.description || ''
+    };
+  });
 }
 
 const newResume = await Resume.create({userId , title , ...parsedData})

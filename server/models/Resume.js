@@ -16,6 +16,7 @@ const ResumeSchema = new mongoose.Schema({
         phone:{type:String , default:''},
         location:{type:String , default:''},
         linkedin:{type:String , default:''},
+        github:{type:String , default:''},
         website:{type:String , default:''}
     },
 
@@ -32,7 +33,13 @@ const ResumeSchema = new mongoose.Schema({
      projects: [
     {
         name: { type: String },
+        title: { type: String },
         type: { type: String },
+        techStack: { type: String },
+        link: { type: String },
+        website: { type: String },
+        github: { type: String },
+        github_link: { type: String },
         description: { type: String },
     }
     ],
