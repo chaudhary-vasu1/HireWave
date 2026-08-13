@@ -1,5 +1,5 @@
 import React from 'react'
-import { Mail, Lock, User2 } from "lucide-react";
+import { Mail, Lock, User2, Eye, EyeOff } from "lucide-react";
 import api from '../configs/api.js';
 import {useDispatch} from 'react-redux'
 import { login } from '../app/features/authSlice.js';
@@ -14,6 +14,7 @@ const Login = () => {
     const query = new URLSearchParams(window.location.search)
     const urlState = query.get('state');
     const [state, setState] = React.useState( urlState||"login")
+    const [showPassword, setShowPassword] = React.useState(false)
 
     const [formData, setFormData] = React.useState({
         name: '',
@@ -89,7 +90,7 @@ const Login = () => {
         <div className="flex items-center mt-3 w-full bg-slate-50 border border-slate-200/80 h-11 rounded-xl overflow-hidden px-4 gap-3 focus-within:ring-2 focus-within:ring-sky-500/30 focus-within:border-sky-500 focus-within:bg-white transition-all">
           <Lock size={16} className="text-slate-400 shrink-0" />
           <input 
-            type="password" 
+            type={showPassword ? "text" : "password"} 
             name="password" 
             placeholder="Password" 
             className="w-full text-sm bg-transparent border-none outline-none ring-0 placeholder:text-slate-400 text-slate-800" 
@@ -97,6 +98,14 @@ const Login = () => {
             onChange={handleChange} 
             required 
           />
+          <button 
+            type="button" 
+            onClick={() => setShowPassword(prev => !prev)}
+            className="text-slate-400 hover:text-slate-600 focus:outline-none shrink-0 cursor-pointer transition-colors p-1"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
         </div>
 
         {state === "login" && (
