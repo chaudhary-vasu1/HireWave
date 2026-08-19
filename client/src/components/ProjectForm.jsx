@@ -73,7 +73,9 @@ const ProjectForm = ({ data = [], onChange }) => {
                     const techVal = Array.isArray(project.techStack) ? project.techStack.join(', ') : (project.techStack || project.type || '');
                     const linkVal = project.link || project.website || project.live_demo || '';
                     const githubVal = project.github || project.github_link || project.githubUrl || '';
-                    const descVal = project.description || '';
+                    const descVal = Array.isArray(project.description) 
+                        ? project.description.map(d => typeof d === 'string' && (d.startsWith('•') || d.startsWith('-') || d.startsWith('*')) ? d : `• ${d}`).join('\n') 
+                        : (project.description || '');
 
                     return (
                         <div key={index} className='p-4 border border-gray-200 rounded-lg space-y-3 bg-white shadow-2xs'>

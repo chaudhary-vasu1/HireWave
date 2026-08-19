@@ -97,7 +97,7 @@ Provide data in EXACTLY the following JSON format with no extra markdown or wrap
       "position": "Job Title",
       "start_date": "Jan 2020",
       "end_date": "Present",
-      "description": "Responsibility or accomplishment",
+      "description": ["Bullet point 1", "Bullet point 2"],
       "is_current": false
     }
   ],
@@ -105,7 +105,7 @@ Provide data in EXACTLY the following JSON format with no extra markdown or wrap
     {
       "name": "Project Name",
       "type": "Web App / Tech Stack",
-      "description": "Project overview and features",
+      "description": ["Key feature bullet point 1", "Key feature bullet point 2"],
       "link": "Live demo or project link URL if present in resume text",
       "github": "GitHub repository URL if present in resume text"
     }
@@ -157,6 +157,21 @@ if (Array.isArray(parsedData.certifications)) {
   );
 }
 
+// Helper to normalize descriptions (ensuring bullet arrays or clean multiline text)
+const normalizeDescription = (desc) => {
+  if (Array.isArray(desc)) return desc;
+  if (typeof desc === 'string') return desc;
+  return '';
+};
+
+// Normalize experience
+if (Array.isArray(parsedData.experience)) {
+  parsedData.experience = parsedData.experience.map(exp => ({
+    ...exp,
+    description: normalizeDescription(exp.description || exp.responsibilities)
+  }));
+}
+
 // Normalize projects to ensure link and github fields are preserved and mirrored
 if (Array.isArray(parsedData.projects)) {
   parsedData.projects = parsedData.projects.map(proj => {
@@ -174,7 +189,7 @@ if (Array.isArray(parsedData.projects)) {
       website: link,
       github: github,
       github_link: github,
-      description: proj.description || ''
+      description: normalizeDescription(proj.description || proj.points)
     };
   });
 }

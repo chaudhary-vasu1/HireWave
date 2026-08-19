@@ -26,7 +26,7 @@ const ResumeSchema = new mongoose.Schema({
         position: { type: String },
         start_date: { type: String },
         end_date: { type: String },
-        description: { type: String },
+        description: { type: mongoose.Schema.Types.Mixed },
         is_current: { type: Boolean },
 }
     ],
@@ -40,7 +40,7 @@ const ResumeSchema = new mongoose.Schema({
         website: { type: String },
         github: { type: String },
         github_link: { type: String },
-        description: { type: String },
+        description: { type: mongoose.Schema.Types.Mixed },
     }
     ],
 

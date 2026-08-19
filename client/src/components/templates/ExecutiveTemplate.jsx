@@ -1,4 +1,5 @@
 import React from "react";
+import { parseBulletPoints } from "../../utils/bulletUtils.js";
 
 const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
     const personalInfo = data?.personal_info || data?.personalInfo || {};
@@ -19,12 +20,7 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
         company: exp.company || "",
         startDate: exp.startDate || exp.start_date || exp.startYear || "",
         endDate: exp.endDate || exp.end_date || exp.endYear || (exp.is_current ? "Present" : ""),
-        description: (Array.isArray(exp.description) 
-            ? exp.description 
-            : Array.isArray(exp.responsibilities) 
-            ? exp.responsibilities 
-            : exp.description ? [exp.description] 
-            : exp.responsibilities ? [exp.responsibilities] : []).filter(item => typeof item === 'string' && item.trim().length > 0)
+        description: parseBulletPoints(exp.description || exp.responsibilities)
     })).filter(exp => exp.position.trim() || exp.company.trim() || exp.description.length > 0);
 
     const rawEducation = data?.education || [];
@@ -42,8 +38,9 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
         link: proj.link || proj.website || proj.live_demo || "",
         github: proj.github || proj.github_link || proj.githubUrl || proj.repo || "",
         description: proj.description || "",
+        points: parseBulletPoints(proj.description || proj.points),
         techStack: Array.isArray(proj.techStack) ? proj.techStack.join(", ") : (proj.techStack || proj.type || "")
-    })).filter(proj => proj.title.trim() || proj.description.trim() || proj.link.trim() || proj.github.trim());
+    })).filter(proj => proj.title.trim() || proj.points.length > 0 || proj.link.trim() || proj.github.trim());
 
     const rawCertifications = data?.certifications || [];
     const certifications = rawCertifications
@@ -161,7 +158,15 @@ const ExecutiveTemplate = ({ data, accentColor = "#1e3a8a" }) => {
                                             )}
                                         </div>
                                     </div>
-                                    <p className="text-xs text-slate-800 mt-1 font-sans">{project.description}</p>
+                                    {project.points && project.points.length > 1 ? (
+                                        <ul className="list-disc ml-5 mt-1 text-xs text-slate-800 space-y-1 font-sans">
+                                            {project.points.map((pt, i) => (
+                                                <li key={i}>{pt}</li>
+                                            ))}
+                                        </ul>
+                                    ) : project.points && project.points.length === 1 ? (
+                                        <p className="text-xs text-slate-800 mt-1 font-sans">{project.points[0]}</p>
+                                    ) : null}
                                     {project.techStack && (
                                         <p className="text-xs text-slate-600 mt-1 font-sans">
                                             <strong>Tech Stack:</strong> {project.techStack}
