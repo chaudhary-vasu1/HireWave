@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { 
   Scan, 
@@ -31,6 +31,18 @@ const AtsScanner = () => {
 
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
+
+  const reportRef = useRef(null);
+
+  // Auto-scroll to report when scan results are ready
+  useEffect(() => {
+    if (scanResult && reportRef.current) {
+      const timer = setTimeout(() => {
+        reportRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [scanResult]);
 
   // Fetch saved user resumes for "select" option
   useEffect(() => {
@@ -308,7 +320,7 @@ const AtsScanner = () => {
 
         {/* Results Section */}
         {scanResult && (
-          <div className="space-y-6 transition-all duration-500 animate-in fade-in">
+          <div ref={reportRef} className="space-y-6 transition-all duration-500 animate-in fade-in scroll-mt-24">
             
             {/* Overall Score Header Card */}
             <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-xl p-6 sm:p-8">
