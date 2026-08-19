@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom'
 import { logout } from '../app/features/authSlice.js';
 
-import { Scan } from 'lucide-react';
+import { Scan, Home } from 'lucide-react';
 
 const Navbar = () => {
   const dispatch = useDispatch()
@@ -19,8 +19,17 @@ const Navbar = () => {
   return (
     <header className='sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all'>
       <nav className='max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 text-slate-800'>
-        <Link to='/' className='flex items-center gap-2 group transition-transform active:scale-95'>
-          <img src='/logo.svg' alt='logo' className="h-8 w-auto transition-transform group-hover:scale-105" />
+        <Link 
+          to='/' 
+          title="Go to Home Page"
+          aria-label="Go to Home Page"
+          className='flex items-center gap-2.5 group transition-all active:scale-95 cursor-pointer relative'
+        >
+          <img src='/logo.svg' alt='HireWave Logo' className="h-8 w-auto transition-transform group-hover:scale-105" />
+          <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-200/80 px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-2xs pointer-events-none">
+            <Home className="size-3 text-sky-600" />
+            <span>Home</span>
+          </span>
         </Link>
 
         <div className='flex items-center gap-3 text-sm'>
