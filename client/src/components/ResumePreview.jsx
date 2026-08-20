@@ -35,36 +35,46 @@ const ResumePreview = ({data , template , accentColor , classes = ''}) => {
       <div id = 'resume-preview' className={`border border-gray-200 print:shadow-none print:border-none min-w-[320px] sm:min-w-0 ${classes}`}>
         {renderTemplate()}
       </div>
-      <style >
+      <style>
         {`
         @page {
-       size: letter;
-        margin: 0;
+          size: A4 portrait;
+          margin: 0;
         }
         @media print {
-        html, body {
-        width: 8.5in;
-        height: 11in;
-        overflow: hidden;
-        }
-        body *{
-          visibility: hidden;
-        }
-         #resume-preview, #resume-preview * {
-         visibility: visible;
-        }
+          html, body, #root, main, div, section {
+            display: block !important;
+          }
 
-        #resume-preview{
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 100%;
-              height: auto;
-              margin: 0;
-              padding: 0;
-              box-shadow: none ! important;
-              border: none !important;
-        }
+          body * {
+            visibility: hidden !important;
+          }
+
+          #resume-preview, #resume-preview * {
+            visibility: visible !important;
+          }
+
+          #resume-preview {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            z-index: 999999 !important;
+            background-color: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          #resume-preview img {
+            max-width: 100% !important;
+            object-fit: cover !important;
+          }
         }
         `}
       </style>
